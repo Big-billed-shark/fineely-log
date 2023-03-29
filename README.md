@@ -1,6 +1,8 @@
 # [Fineely-log](http://www.fineely.com/)
 
-基于spring-aop实现的rest接口日志收集，支持kakfa、openFeign
+
+The rest interface log collection based on spring aop implementation supports kakfa and openFeign
+
 <!---
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j-api.svg)](https://search.maven.org/artifact/org.apache.logging.log4j/log4j-api)
 [![build (2.x)](https://img.shields.io/github/actions/workflow/status/apache/logging-log4j2/build.yml?branch=2.x&label=build%20%282.x%29)](https://github.com/apache/logging-log4j2/actions/workflows/build.yml)
@@ -44,30 +46,221 @@ public class Example {
 }
 ```
 
-And an example `application.yml` configuration file:
-
+And an `queue` example `application.yml` configuration file:
 ```yaml
 fineely:
   log:
-    # Caching mode supports "feign", ”kafka“ and ”default“. "default" only requires set storage-mode
+    storage-mode: queue
+```
+
+Processing method of the `queue` :
+
+```java
+package com.example;
+
+import com.fineelyframework.log.entity.MethodLogEntity;
+import com.fineelyframework.log.queue.QueueOperator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.LinkedTransferQueue;
+
+/**
+ * fineely.log.storageMode = queue
+ */
+@Slf4j
+@Component
+@ConditionalOnProperty(prefix = "fineely.log", name = "storage-mode", havingValue = "queue")
+public class LogQueueTask {
+
+
+    @Scheduled(fixedRate = 5000)
+    public void monitorQueueLog(){
+        LinkedTransferQueue<MethodLogEntity> oplogQueue = QueueOperator.oplogQueue;
+        if (!oplogQueue.isEmpty()) {
+            // do something
+            List<MethodLogEntity> oplogs = new ArrayList<>();
+            oplogQueue.drainTo(oplogs);
+            for (MethodLogEntity oplog : oplogs) {
+                log.info("::::::: log：[{}]", oplog.toString());
+            }
+        } else {
+            log.info("::::::: No log temporarily");
+        }
+    }
+}
+```
+
+And an `feign` example `application.yml` configuration file:
+```yaml
+fineely:
+  log:
     storage-mode: feign
+    # Choose between the name and url
+    # Without eureka, Please use path
     feign:
-      name: your application name
+      # Application Name registered in eureka
+      name: example
       url: http://localhost:8895
       path: /test
+# If you need eureka, you can add configurations, set fineely.log.feign.name = target spring.application.name
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:1112/eureka/
   instance:
     prefer-ip-address: true
-# if use fineely.log.storage-mode equals kafka, open the following note
- kafka:
-   kafka-brokers: 192.168.3.190:9092
-   topic: test-server
-   group-id: e27121ee40c6c6f45f91ab52101b1122
 ```
 
+Processing method of the `feign` :
+
+```java
+public class LogEntity {
+
+    private RequestMethod[] method;
+    private String methodName;
+    private String module;
+    private String url;
+    private String desc;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private double timeConsuming;
+    private String allParams;
+    private String result;
+    private String ipAddress;
+    private String exceptionInfo;
+    private String operator;
+    private LocalDateTime createTime;
+}
+
+@RestController
+@RequestMapping("/test")
+public class TestController {
+
+    /**
+     * feign mode mapping url is `save`
+     */
+    @PostMapping("save")
+    public boolean saveLog(@RequestBody LogEntity logEntity) {
+        System.out.println(myEntity.toString());
+        // do something
+        return true;
+    }
+}
+```
+
+And an ”kafka“ example `application.yml` configuration file:
+```yaml
+fineely:
+  log:
+    storage-mode: kafka
+    kafka:
+      kafka-brokers: 192.168.3.190:9092
+      topic: test-server
+      group-id: e27121ee40c6c6f45f91ab52101b1122
+```
+Processing method of the `kafka` :
+
+```java
+@Configuration
+public class KafkaConfig {
+
+    @Value("${kafka_brokers}")
+    private String KAFKA_BROKERS;
+
+    @Bean
+    @ConditionalOnMissingBean(
+            name = {"messageReceiveListener"}
+    )
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> messageReceiveListener() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = this.kafkaListenerContainerFactory();
+        factory.setConcurrency(4);
+        return factory;
+    }
+
+    private ConcurrentKafkaListenerContainerFactory kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory();
+        factory.setConsumerFactory(new DefaultKafkaConsumerFactory(this.consumerConfigs()));
+        factory.setBatchListener(true);
+        factory.getContainerProperties().setPollTimeout(1500L);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        return factory;
+    }
+
+    private Map<String, Object> consumerConfigs() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.KAFKA_BROKERS);
+        configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        configs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 50);
+        configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        configs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 200000);
+        configs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 15000);
+        configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 15728640);
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        return configs;
+    }
+
+}
+
+/**
+ * Kafka listener, listening for log notifications
+ */
+@Slf4j
+@Component
+public class KafkaMessageHandler {
+
+    @KafkaListener(
+            containerFactory = "messageReceiveListener",
+            topics = {"${topic}"},
+            groupId = "${group-id}"
+    )
+    public void consumerCommonMessageNotify(List<ConsumerRecord<?, ?>> records, Acknowledgment ack) {
+        try {
+            records.forEach(content -> {
+                log.info("=====:::::: Start processing message=====");
+                // do something
+                String message = content.value().toString();
+                log.info(String.format(":::::: Receive message content => %s", message));
+                log.info("=====:::::: Processing Message End=====");
+            });
+        } catch (Exception e) {
+            log.error(":::::: Message processing error => ", e);
+        } finally {
+            ack.acknowledge();
+        }
+    }
+}
+```
+
+## Senior
+
+Custom Implementation Storage
+
+```java
+import com.fineelyframework.log.entity.MethodLogEntity;
+
+/**
+ * CustomLogDaoImpl
+ * Implement the MethodLogDao interface
+ */
+@Slf4j
+@Component
+public class CustomLogDaoImpl implements MethodLogDao {
+
+
+    @Override
+    public boolean saveLog(MethodLogEntity methodLogEntity) {
+        // do something
+        return true;
+    }
+
+}
+```
 
 ## Issue Tracking
 
