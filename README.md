@@ -46,6 +46,45 @@ public class Example {
 }
 ```
 
+In FineelyLog, annotations have a high-level description configuration
+
+```java
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FineelyLog {
+
+    /**
+     * Request Method
+     */
+    RequestMethod[] method() default {};
+
+    /**
+     * Module
+     */
+    String module() default "";
+
+    /**
+     * Description
+     * Parameter Name ${name} or ${class.name}
+     * Common parameters are as follows:
+     * 
+     * Method returns a result: ${result.**}
+     * Method name: ${methodName}
+     * Method execution start time: ${startTime}
+     * Method execution end time: ${endTime}
+     * Courtship parameter: ${request.**}
+     * Array matching: ${result.data[0].name}
+     */
+    String desc() default "";
+
+    /**
+     * Request Address
+     */
+    String url() default "";
+}
+```
+
 And an `queue` example `application.yml` configuration file:
 ```yaml
 fineely:
@@ -58,25 +97,12 @@ Processing method of the `queue` :
 ```java
 package com.example;
 
-import com.fineelyframework.log.entity.MethodLogEntity;
-import com.fineelyframework.log.queue.QueueOperator;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.LinkedTransferQueue;
-
 /**
  * fineely.log.storageMode = queue
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(prefix = "fineely.log", name = "storage-mode", havingValue = "queue")
 public class LogQueueTask {
-
 
     @Scheduled(fixedRate = 5000)
     public void monitorQueueLog(){
@@ -120,7 +146,6 @@ Processing method of the `feign` :
 
 ```java
 public class LogEntity {
-
     private RequestMethod[] method;
     private String methodName;
     private String module;
@@ -153,7 +178,7 @@ public class TestController {
 }
 ```
 
-And an ”kafka“ example `application.yml` configuration file:
+And an `kafka` example `application.yml` configuration file:
 ```yaml
 fineely:
   log:
@@ -177,31 +202,19 @@ public class KafkaConfig {
             name = {"messageReceiveListener"}
     )
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> messageReceiveListener() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = this.kafkaListenerContainerFactory();
-        factory.setConcurrency(4);
-        return factory;
-    }
-
-    private ConcurrentKafkaListenerContainerFactory kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(new DefaultKafkaConsumerFactory(this.consumerConfigs()));
         factory.setBatchListener(true);
         factory.getContainerProperties().setPollTimeout(1500L);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        factory.setConcurrency(4);
         return factory;
     }
 
     private Map<String, Object> consumerConfigs() {
         Map<String, Object> configs = new HashMap<>();
         configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.KAFKA_BROKERS);
-        configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        configs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 50);
-        configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        configs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 200000);
-        configs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 15000);
-        configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 15728640);
-        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        // Other configurations ...
         return configs;
     }
 
@@ -247,6 +260,7 @@ import com.fineelyframework.log.entity.MethodLogEntity;
 /**
  * CustomLogDaoImpl
  * Implement the MethodLogDao interface
+ * Yml does not need to add configuration
  */
 @Slf4j
 @Component

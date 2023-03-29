@@ -1,12 +1,14 @@
 package com.fineelyframework.log.dao;
 
 import com.fineelyframework.log.entity.MethodLogEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(prefix = "fineely.log", name = "storage-mode", havingValue = "feign")
 public class FineelyLogFeignImpl implements FineelyLogFeign {
 
 
