@@ -1,0 +1,40 @@
+plugins {
+    id 'org.springframework.boot' version "2.7.6"
+    id 'io.spring.dependency-management' version "1.0.11.RELEASE"
+    id 'java'
+}
+
+group 'com.fineelyframework'
+version '1.0.0'
+def artifactId = "fineely-log"
+archivesBaseName = artifactId
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    compileOnly "org.springframework.boot:spring-boot-starter-web"
+    compileOnly 'org.springframework.kafka:spring-kafka:2.6.3'
+    compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.5'
+
+    implementation 'org.springframework.boot:spring-boot-starter-aop:2.7.4'
+    implementation 'com.alibaba:fastjson:2.0.14.graal'
+    implementation 'org.apache.commons:commons-text:1.8'
+}
+
+jar {
+    baseName = "$archivesBaseName"
+    version = "$project.version"
+    enabled = true
+    classifier = ''
+}
