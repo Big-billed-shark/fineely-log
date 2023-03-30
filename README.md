@@ -1,4 +1,4 @@
-# [Fineely-log](http://www.fineely.com/)
+# [Fineely Log](http://www.fineely.com/)
 
 
 The rest interface log collection based on spring aop implementation supports kakfa and openFeign
@@ -15,6 +15,22 @@ The rest interface log collection based on spring aop implementation supports ka
 ## Pull Requests on Github
 
 By sending a pull request, you grant KeplerLei sufficient permissions to use and publish the work submitted under the KeplerLei license.
+
+## Getting Started
+
+`fineely-log` is available at the Central `Maven` Repository. Maven users add this to your `POM`.
+
+```xml
+<dependency>
+    <groupId>com.fineely</groupId>
+    <artifactId>fineely-log</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+Gradle users add this to your `build.gradle`.
+```groovy
+implementation 'com.fineely:fineely-log:1.0.0'
+```
 
 ## Usage
 
