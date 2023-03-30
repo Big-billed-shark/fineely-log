@@ -163,7 +163,7 @@ Processing method of the `feign` :
 
 ```java
 public class LogEntity {
-    private RequestMethod[] method;
+    private String[] method;
     private String methodName;
     private String module;
     private String url;
