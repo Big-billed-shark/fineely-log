@@ -4,6 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+Kepler Lei_0x17E138F9_SECRET.gpg
+gradle.properties
 
 ### STS ###
 .apt_generated
