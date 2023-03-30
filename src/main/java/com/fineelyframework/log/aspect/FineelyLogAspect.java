@@ -17,23 +17,12 @@ public class FineelyLogAspect {
     @Resource
     MethodLogHandler methodLogHandler;
 
-    /**
-     * 接口调用日志拦截记录方法（调用成功拦截）
-     *
-     * @param point
-     */
     @Around(value = "@annotation(com.fineelyframework.log.annotation.FineelyLog)")
     public Object aroundInterceptor(ProceedingJoinPoint point) throws Throwable {
         return methodLogHandler.interceptorHandler(point);
     }
 
 
-    /**
-     * 接口调用日志拦截记录方法（调用失败拦截）
-     *
-     * @param point
-     * @param ex
-     */
     @AfterThrowing(pointcut = "@annotation(com.fineelyframework.log.annotation.FineelyLog)", throwing = "ex")
     public void printException(JoinPoint point, FineelyLogException ex) {
         methodLogHandler.printExceptionHandler(point, ex);

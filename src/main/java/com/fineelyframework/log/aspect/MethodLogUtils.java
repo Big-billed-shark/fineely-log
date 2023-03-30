@@ -10,17 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
-/**
- * 通用父类
- */
 public class MethodLogUtils {
 
-    /**
-     * 获取request
-     *
-     * @param methodName
-     * @return
-     */
     public static HttpServletRequest getRequest(String methodName) {
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -30,11 +21,6 @@ public class MethodLogUtils {
         }
     }
 
-    /**
-     * 获取操作用户IP
-     *
-     * @return
-     */
     public static String getIpAddress(String methodName, HttpServletRequest request) {
         try {
             return IpUtil.getIpAddress(request);
@@ -43,13 +29,6 @@ public class MethodLogUtils {
         }
     }
 
-    /**
-     * 获取返回参数
-     *
-     * @param methodName
-     * @param returning
-     * @return
-     */
     public static String getReturning(String methodName, Object returning) {
         if (Objects.isNull(returning)) {
             throw new IllegalStateException("当前执行的方法：" + methodName + " 返回值为空，请联系开发人员修改！");
@@ -61,13 +40,6 @@ public class MethodLogUtils {
         }
     }
 
-    /**
-     * 获取输入参数
-     *
-     * @param methodName
-     * @param args
-     * @return
-     */
     public static String getArgsContent(String methodName, Object[] args) {
         if (Objects.isNull(args) || args.length == 0) {
             return null;

@@ -4,17 +4,27 @@ plugins {
     id 'java'
 }
 
-group 'com.fineelyframework'
+apply plugin: "maven-publish"
+apply plugin: 'signing'
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+group 'com.fineely'
 version '1.0.0'
 def artifactId = "fineely-log"
 archivesBaseName = artifactId
 sourceCompatibility = '11'
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
 
 repositories {
     mavenCentral()
@@ -30,6 +40,62 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop:2.7.4'
     implementation 'com.alibaba:fastjson:2.0.14.graal'
     implementation 'org.apache.commons:commons-text:1.8'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            version project.version
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                // 构件名称
+                // 区别于artifactId，可以理解为artifactName
+                name = 'fineely-log'
+                description = 'The rest interface log collection based on spring aop implementation supports kakfa and openFeign'
+                url = 'https://github.com/Big-billed-shark/fineely-log'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://mit-license.org/'
+                    }
+                }
+                developers {
+                    developer {
+                        name = 'Kepler Lei'
+                        email = 'kepler_16b@163.com'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/Big-billed-shark/fineely-log'
+                    connection = 'scm:git:https://github.com/Big-billed-shark/fineely-log.git'
+                    developerConnection = 'scm:git:https://github.com/Big-billed-shark/fineely-log.git'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name 'fineely-log'
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+}
+
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    options.encoding = "UTF-8"
+    failOnError = false
 }
 
 jar {

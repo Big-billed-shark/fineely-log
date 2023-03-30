@@ -8,22 +8,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * 替换策略
- */
 public abstract class ReplaceStrategy {
 
     protected Pattern pattern = Pattern.compile("\\$\\{(.*?)}");
     protected Pattern arrayPattern = Pattern.compile(".*?\\[\\d\\]");
 
-    /**
-     * 原始描述
-     */
     protected String content;
 
-    /**
-     * 替换所需的map
-     */
     protected Map<String, Object> paramMap = new HashMap<>();
 
     public abstract Termination execute(String content);
@@ -40,20 +31,11 @@ public abstract class ReplaceStrategy {
         return paramMap.get(key);
     }
 
-    /**
-     * 处理描述，替换内容
-     */
     protected String handleContent(Map<String, Object> result, String str) {
         StringSubstitutor stringSubstitutor = new StringSubstitutor(result);
         return stringSubstitutor.replace(str);
     }
 
-    /**
-     * 判断是否为数组取值, 并返回数组下标
-     *
-     * @param value 判断值
-     * @return 不为数组返回-1
-     */
     protected int getArrayIndex(String value) {
         Matcher matcher = arrayPattern.matcher(value);
         if (matcher.find()) {

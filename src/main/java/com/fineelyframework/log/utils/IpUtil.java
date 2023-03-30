@@ -6,9 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-/**
- * IP地址工具类
- */
 public abstract class IpUtil {
 
     private static final String IPV4 = "ipv4";
@@ -19,9 +16,6 @@ public abstract class IpUtil {
 
     }
 
-    /**
-     * ipv4字符串转为long
-     */
     public static long ipToLong(String ipv4) {
         String[] splits = ipv4.split("\\.");
         long l = 0;
@@ -32,21 +26,6 @@ public abstract class IpUtil {
         return l;
     }
 
-    /**
-     * long转为ipv4字符串
-     */
-    public static String longToIp(long l) {
-        String ip = "";
-        ip = ip + (l >>> 24);
-        ip = ip + "." + ((0x00ffffff & l) >>> 16);
-        ip = ip + "." + ((0x0000ffff & l) >>> 8);
-        ip = ip + "." + (0x000000ff & l);
-        return ip;
-    }
-
-    /**
-     * ipv6字符串转BigInteger数
-     */
     public static BigInteger ipv6ToInt(String ipv6) {
         int compressIndex = ipv6.indexOf("::");
         if (compressIndex != -1) {
@@ -75,55 +54,6 @@ public abstract class IpUtil {
         return big;
     }
 
-    /**
-     * BigInteger数 转为ipv6字符串
-     */
-    public static String intToIpv6(BigInteger big) {
-        String str = "";
-        BigInteger ff = BigInteger.valueOf(0xffff);
-        for (int i = 0; i < 8; i++) {
-            str = big.and(ff).toString(16) + ":" + str;
-            big = big.shiftRight(16);
-        }
-        //去掉最后的：号
-        str = str.substring(0, str.length() - 1);
-        return str.replaceFirst("(^|:)(0+(:|$)){2,8}", "::");
-    }
-
-    /**
-     * 将精简的ipv6地址扩展为全长度的ipv6地址
-     */
-    public static String completeIpv6(String strIpv6) {
-        BigInteger big = ipv6ToInt(strIpv6);
-        String str = big.toString(16);
-        String completeIpv6Str = "";
-        while (str.length() != 32) {
-            str = "0" + str;
-        }
-        for (int i = 0; i <= str.length(); i += 4) {
-            completeIpv6Str += str.substring(i, i + 4);
-            if ((i + 4) == str.length()) {
-                break;
-            }
-            completeIpv6Str += ":";
-        }
-        return completeIpv6Str;
-    }
-
-    /**
-     * 获取用户真实IP地址，不使用request.getRemoteAddr();的原因是有可能用户使用了代理软件方式避免真实IP地址,
-     * <p>
-     * 可是，如果通过了多级反向代理的话，X-Forwarded-For的值并不止一个，而是一串IP值，究竟哪个才是真正的用户端的真实IP呢？
-     * 答案是取X-Forwarded-For中第一个非unknown的有效IP字符串。
-     * <p>
-     * 如：X-Forwarded-For：192.168.1.110, 192.168.1.120, 192.168.1.130,
-     * 192.168.1.100
-     * <p>
-     * 用户真实IP为： 192.168.1.110
-     *
-     * @param request
-     * @return
-     */
     public static String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
         if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
@@ -159,18 +89,6 @@ public abstract class IpUtil {
             return IPV6;
         }
         return IPV4;
-    }
-
-    public static boolean validateIp(String ip, long start, long end) {
-        long ipLong = 0;
-        String ipType = checkIpv4OrIpv6(ip);
-        if (IPV4.equals(ipType)) {
-            ipLong = ipToLong(ip);
-        }
-        if (IPV6.equals(ipType)) {
-            ipLong = ipv6ToInt(ip).longValue();
-        }
-        return ipLong >= start && ipLong <= end;
     }
 
 }

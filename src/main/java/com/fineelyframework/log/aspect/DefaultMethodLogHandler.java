@@ -31,11 +31,6 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
     @Resource
     private MethodLogDao methodLogDao;
 
-    /**
-     * 接口调用日志拦截记录方法（调用成功拦截）
-     *
-     * @param point
-     */
     @Override
     public Object interceptorHandler(ProceedingJoinPoint point) throws Throwable {
         // 记录开始执行时间
@@ -52,12 +47,6 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
         return result;
     }
 
-    /**
-     * 接口调用日志拦截记录方法（调用失败拦截）
-     *
-     * @param point
-     * @param ex
-     */
     @Override
     public void printExceptionHandler(JoinPoint point, FineelyLogException ex) {
         // 记录开始执行时间
@@ -71,9 +60,6 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
         handleOpenApiLog(point, null, startTime, null, 0, errorResult);
     }
 
-    /**
-     * 处理日志并存储
-     */
     @Override
     public void handleOpenApiLog(JoinPoint point, Object result,
                                  LocalDateTime startTime, LocalDateTime endTime, double timeConsuming, String exceptionInfo) {
