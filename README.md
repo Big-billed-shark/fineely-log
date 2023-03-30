@@ -32,14 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/example")
 public class Example {
 
-    @RequestMapping("/hello")
-    @FineelyLog(method = RequestMethod.POST, module = "example", url = "/example/hello")
+    @GetMapping("/hello")
+    @FineelyLog(method = RequestMethod.GET, module = "example", url = "/example/hello")
     public String hello(String name) {
         return "Hello: " + name;
     }
 
     @GetMapping("/name")
-    @FineelyLog(method = RequestMethod.POST, module = "example", desc = "${name}")
+    @FineelyLog(method = RequestMethod.GET, module = "example", desc = "${name}")
     public String name(String name) {
         return name;
     }
@@ -262,7 +262,6 @@ import com.fineelyframework.log.entity.MethodLogEntity;
  * Implement the MethodLogDao interface
  * Yml does not need to add configuration
  */
-@Slf4j
 @Component
 public class CustomLogDaoImpl implements MethodLogDao {
 
