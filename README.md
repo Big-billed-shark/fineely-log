@@ -9,7 +9,7 @@ The rest interface log collection based on spring aop implementation supports ka
 [![build (3.x)](https://img.shields.io/github/actions/workflow/status/apache/logging-log4j2/build.yml?branch=main&label=build%20%283.x%29)](https://github.com/apache/logging-log4j2/actions/workflows/build.yml)
 ![CodeQL](https://github.com/apache/logging-log4j2/actions/workflows/codeql-analysis.yml/badge.svg)
 -->
-[![Maven Central](https://img.shields.io/static/v1?label=maven-central&message=v1.0.0&color=blue)](https://central.sonatype.com/artifact/com.fineely/fineely-log/1.0.0)
+[![Maven Central](https://img.shields.io/static/v1?label=maven-central&message=v1.0.1&color=blue)](https://central.sonatype.com/artifact/com.fineely/fineely-log/1.0.1)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/static/v1?label=dependencies&message=update&color=g)
 
 ## Pull Requests on Github
@@ -24,12 +24,12 @@ By sending a pull request, you grant KeplerLei sufficient permissions to use and
 <dependency>
     <groupId>com.fineely</groupId>
     <artifactId>fineely-log</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 Gradle users add this to your `build.gradle`.
 ```groovy
-implementation 'com.fineely:fineely-log:1.0.0'
+implementation 'com.fineely:fineely-log:1.0.1'
 ```
 
 ## Usage
@@ -123,7 +123,7 @@ public class LogQueueTask {
 
     @Scheduled(fixedRate = 5000)
     public void monitorQueueLog(){
-        LinkedTransferQueue<MethodLogEntity> oplogQueue = QueueOperator.oplogQueue;
+        LinkedTransferQueue<MethodLogEntity> oplogQueue = QueueOperator.INSTANCE.getOplogQueue();
         if (!oplogQueue.isEmpty()) {
             // do something
             List<MethodLogEntity> oplogs = new ArrayList<>();

@@ -9,7 +9,7 @@ public class QueueMethodLogDaoImpl implements MethodLogDao {
 
     @Override
     public boolean saveLog(MethodLogEntity methodLogEntity) {
-        QueueOperator.oplogQueue.add(methodLogEntity);
+        QueueOperator.INSTANCE.getOplogQueue().add(methodLogEntity);
         return true;
     }
 

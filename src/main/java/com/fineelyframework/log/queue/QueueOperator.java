@@ -5,12 +5,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.LinkedTransferQueue;
 
-public class QueueOperator {
+/**
+ * queue operator
+ */
+public enum QueueOperator {
+    INSTANCE;
 
-    /**
-     * 日志缓存队列
-     */
-    public static LinkedTransferQueue<MethodLogEntity> oplogQueue = new LinkedTransferQueue<>();
+    private LinkedTransferQueue<MethodLogEntity> oplogQueue;
 
-    private QueueOperator() {}
+    QueueOperator() {
+        oplogQueue = new LinkedTransferQueue<>();
+    }
+    public LinkedTransferQueue<MethodLogEntity> getOplogQueue() {
+        return oplogQueue;
+    }
+
 }
