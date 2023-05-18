@@ -33,17 +33,12 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
 
     @Override
     public Object interceptorHandler(ProceedingJoinPoint point) throws Throwable {
-        // 记录开始执行时间
         LocalDateTime startTime = LocalDateTime.now();
         long start = System.currentTimeMillis();
-        // 执行业务方法并返回结果
         Object result = point.proceed();
         long end = System.currentTimeMillis();
-        // 记录结束时间
         LocalDateTime endTime = LocalDateTime.now();
-        // 处理日志并存储
         handleOpenApiLog(point, result, startTime, endTime, end - start, null);
-        // 返回业务方法的返回值
         return result;
     }
 
