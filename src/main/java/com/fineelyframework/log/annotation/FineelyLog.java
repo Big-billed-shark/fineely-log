@@ -24,6 +24,7 @@ public @interface FineelyLog {
      * Method execution end time: ${endTime}
      * Courtship parameter: ${request.**}
      * Array matching: ${result.data[0].name}
+     * @return string
      */
     String desc() default "";
 
