@@ -21,7 +21,7 @@ artifacts {
 }
 
 group 'com.fineely'
-version '1.0.1'
+version '1.0.2'
 def artifactId = "fineely-log"
 archivesBaseName = artifactId
 sourceCompatibility = '11'
@@ -38,7 +38,7 @@ dependencies {
     compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.5'
 
     implementation 'org.springframework.boot:spring-boot-starter-aop:2.7.4'
-    implementation 'com.alibaba:fastjson:2.0.25'
+    implementation 'com.alibaba:fastjson:2.0.32'
     implementation 'org.apache.commons:commons-text:1.10.0'
 }
 

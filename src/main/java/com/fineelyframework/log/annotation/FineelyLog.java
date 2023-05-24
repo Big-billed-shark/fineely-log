@@ -13,6 +13,18 @@ public @interface FineelyLog {
 
     String module() default "";
 
+    /**
+     * Description
+     * Parameter Name ${name} or ${class.name}
+     * Common parameters are as follows:
+     *
+     * Method returns a result: ${result.**}
+     * Method name: ${methodName}
+     * Method execution start time: ${startTime}
+     * Method execution end time: ${endTime}
+     * Courtship parameter: ${request.**}
+     * Array matching: ${result.data[0].name}
+     */
     String desc() default "";
 
     String url() default "";

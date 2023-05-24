@@ -1,7 +1,7 @@
-package com.fineelyframework.log.aspect;
+package com.fineelyframework.log.utils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fineelyframework.log.utils.IpUtil;
+import com.alibaba.fastjson2.JSONObject;
+import com.fineelyframework.log.entity.ParamMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -12,16 +12,17 @@ import java.util.Objects;
 
 public class MethodLogUtils {
 
-    public static HttpServletRequest getRequest(String methodName) {
+    public static HttpServletRequest getRequest() {
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             return attributes.getRequest();
         } catch (Exception e) {
-            throw new IllegalStateException("当前执行的方法：" + methodName + " 获取HttpServletRequest参数失败，请联系开发人员！");
+            e.printStackTrace();
+            return null;
         }
     }
 
-    public static String getIpAddress(String methodName, HttpServletRequest request) {
+    public static String getIpAddress(HttpServletRequest request) {
         try {
             return IpUtil.getIpAddress(request);
         } catch (Exception e) {
@@ -29,10 +30,7 @@ public class MethodLogUtils {
         }
     }
 
-    public static String getReturning(String methodName, Object returning) {
-        if (Objects.isNull(returning)) {
-            throw new IllegalStateException("当前执行的方法：" + methodName + " 返回值为空，请联系开发人员修改！");
-        }
+    public static String getReturning(Object returning) {
         try {
             return JSONObject.toJSONString(returning);
         } catch (Exception e) {
@@ -40,7 +38,7 @@ public class MethodLogUtils {
         }
     }
 
-    public static String getArgsContent(String methodName, Object[] args) {
+    public static String getArgsContent(Object[] args) {
         if (Objects.isNull(args) || args.length == 0) {
             return null;
         }
@@ -48,10 +46,10 @@ public class MethodLogUtils {
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
-                if (arg == null || arg instanceof HttpServletRequest || arg instanceof HttpServletResponse) {
+                if (arg == null || arg instanceof ParamMap || arg instanceof HttpServletRequest || arg instanceof HttpServletResponse) {
                     continue;
                 }
-                builder.append(arg);
+                builder.append(arg instanceof String ? arg : JSONObject.from(arg).toJSONString());
                 if (i < args.length - 1) {
                     builder.append(",");
                 }

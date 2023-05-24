@@ -3,7 +3,6 @@ package com.fineelyframework.log.entity;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 public class MethodLogEntity {
 

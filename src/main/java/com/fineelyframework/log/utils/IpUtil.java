@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Objects;
 
 public abstract class IpUtil {
 
@@ -55,6 +56,9 @@ public abstract class IpUtil {
     }
 
     public static String getIpAddress(HttpServletRequest request) {
+        if (Objects.isNull(request)) {
+            return "";
+        }
         String ip = request.getHeader("x-forwarded-for");
         if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");

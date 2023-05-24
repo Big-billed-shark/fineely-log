@@ -6,9 +6,11 @@ import com.fineelyframework.log.annotation.FineelyLogMapping;
 import com.fineelyframework.log.constants.CommonConstants;
 import com.fineelyframework.log.dao.MethodLogDao;
 import com.fineelyframework.log.entity.MethodLogEntity;
+import com.fineelyframework.log.entity.ParamMap;
 import com.fineelyframework.log.exception.FineelyLogException;
 import com.fineelyframework.log.strategy.ReplaceStrategy;
 import com.fineelyframework.log.strategy.SimpleStrategy;
+import com.fineelyframework.log.utils.MethodLogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -44,14 +46,11 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
 
     @Override
     public void printExceptionHandler(JoinPoint point, FineelyLogException ex) {
-        // 记录开始执行时间
         LocalDateTime startTime = LocalDateTime.now();
-        // 获取异常信息
         String message = ex.getMessage();
         StackTraceElement[] stackTrace = ex.getStackTrace();
         String stackTraceMsg = Arrays.stream(stackTrace).map(StackTraceElement::toString).collect(Collectors.joining("  "));
         String errorResult = String.format("message: %s; stackTraceMsg: %s", message, stackTraceMsg);
-        // 处理日志并存储
         handleOpenApiLog(point, null, startTime, null, 0, errorResult);
     }
 
@@ -60,15 +59,10 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
                                  LocalDateTime startTime, LocalDateTime endTime, double timeConsuming, String exceptionInfo) {
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         String methodName = methodSignature.getName();
-        // 从参数中获取request对象
-        HttpServletRequest request = MethodLogUtils.getRequest(methodName);
-        // 获取IP地址
-        String ipAddress = MethodLogUtils.getIpAddress(methodName, request);
-        // 获取方法输入参数
-        String args = MethodLogUtils.getArgsContent(methodName, point.getArgs());
-        // 获取方法返回参数
-        String returning = MethodLogUtils.getReturning(methodName, result);
-        // 获取当前执行方法的信息
+        HttpServletRequest request = MethodLogUtils.getRequest();
+        String ipAddress = MethodLogUtils.getIpAddress(request);
+        String args = MethodLogUtils.getArgsContent(point.getArgs());
+        String returning = MethodLogUtils.getReturning(result);
         Method method = methodSignature.getMethod();
         String desc;
         RequestMethod[] methods;
@@ -87,16 +81,19 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
             module = annotation.module();
             url = annotation.url();
         }
-        // 获取简单替换策略替换desc
+        Object[] originalArgs = point.getArgs();
         ReplaceStrategy replaceStrategy = new SimpleStrategy();
-        // 添加返回结果对象 到替换策略中
+        for (Object originalArg : originalArgs) {
+            if (originalArg instanceof ParamMap) {
+                replaceStrategy.appendParamMap((ParamMap) originalArg);
+            }
+        }
         replaceStrategy.appendParamMap("result", JSONObject.toJSONString(result));
         replaceStrategy.appendParamMap("methodName", method.getName());
         replaceStrategy.appendParamMap("startTime", startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         if (Objects.nonNull(endTime)) {
             replaceStrategy.appendParamMap("endTime", endTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
-        // 请求参数
         Map<String, String[]> requestParameterMap = request.getParameterMap();
         if (Objects.nonNull(requestParameterMap)) {
             Map<String, String> map = new HashMap<>(requestParameterMap.size());
@@ -113,14 +110,10 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
 
         String finishedDesc = replaceStrategy.execute(desc).complete();
 
-        // 创建日志对象
         MethodLogEntity methodLog = new MethodLogEntity();
         methodLog.setDesc(finishedDesc);
-
-        // 设置时间参数
         methodLog.setStartTime(startTime);
         methodLog.setEndTime(endTime);
-        // 调用异常时，没有结束时间
         methodLog.setTimeConsuming(timeConsuming);
         methodLog.setMethodName(methodName);
         methodLog.setAllParams(args);
@@ -141,7 +134,6 @@ public class DefaultMethodLogHandler implements MethodLogHandler {
         } else {
             methodLog.setOperator("system");
         }
-//         存储接口调用日志
         methodLogDao.saveLog(methodLog);
     }
 }

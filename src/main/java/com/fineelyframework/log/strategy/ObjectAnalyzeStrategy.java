@@ -1,6 +1,6 @@
 package com.fineelyframework.log.strategy;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -13,7 +13,9 @@ import java.util.Objects;
  * 测试在属性层级3层中 6个属性值为 8-9ms
  * 在属性少的情况下时间越短
  * 暂时不支持数组不推荐使用
+ * @deprecated 未实现list解析
  */
+@Deprecated
 public class ObjectAnalyzeStrategy extends ReplaceStrategy implements Termination {
 
     @Override
