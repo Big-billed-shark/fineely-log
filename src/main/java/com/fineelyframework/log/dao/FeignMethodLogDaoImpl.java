@@ -2,7 +2,7 @@ package com.fineelyframework.log.dao;
 
 import com.fineelyframework.log.entity.MethodLogEntity;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 public class FeignMethodLogDaoImpl implements MethodLogDao {
 

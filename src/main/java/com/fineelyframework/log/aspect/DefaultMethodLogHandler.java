@@ -11,14 +11,14 @@ import com.fineelyframework.log.exception.FineelyLogException;
 import com.fineelyframework.log.strategy.ReplaceStrategy;
 import com.fineelyframework.log.strategy.SimpleStrategy;
 import com.fineelyframework.log.utils.MethodLogUtils;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

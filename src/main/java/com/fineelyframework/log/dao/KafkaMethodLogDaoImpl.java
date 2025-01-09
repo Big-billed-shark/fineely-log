@@ -5,7 +5,7 @@ import com.fineelyframework.log.config.FineelyKafkaConfig;
 import com.fineelyframework.log.entity.MethodLogEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 public class KafkaMethodLogDaoImpl implements MethodLogDao {
 
