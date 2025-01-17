@@ -9,7 +9,7 @@ The rest interface log collection based on spring aop implementation supports ka
 [![build (3.x)](https://img.shields.io/github/actions/workflow/status/apache/logging-log4j2/build.yml?branch=main&label=build%20%283.x%29)](https://github.com/apache/logging-log4j2/actions/workflows/build.yml)
 ![CodeQL](https://github.com/apache/logging-log4j2/actions/workflows/codeql-analysis.yml/badge.svg)
 -->
-[![Maven Central](https://img.shields.io/static/v1?label=maven-central&message=v1.0.2&color=blue)](https://central.sonatype.com/artifact/com.fineely/fineely-log/1.0.2)
+[![Maven Central](https://img.shields.io/static/v1?label=maven-central&message=v1.0.3&color=blue)](https://central.sonatype.com/artifact/com.fineely/fineely-log/1.0.2)
 [![Maven Central](https://img.shields.io/static/v1?label=KeplerLei&message=CSDN&color=red)](https://blog.csdn.net/leichengjun_510/article/details/129882941)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/static/v1?label=dependencies&message=update&color=g)
 [![MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/Big-billed-shark/fineely-log/blob/main/LICENSE)
