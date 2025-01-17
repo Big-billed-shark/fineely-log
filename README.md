@@ -28,12 +28,18 @@ By sending a pull request, you grant KeplerLei sufficient permissions to use and
 <dependency>
     <groupId>com.fineely</groupId>
     <artifactId>fineely-log</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
+</dependency>
+<dependency>
+    <groupId>com.fineely</groupId>
+    <artifactId>fineely-log-common</artifactId>
+    <version>1.0.3</version>
 </dependency>
 ```
 Gradle users add this to your `build.gradle`.
 ```groovy
-implementation 'com.fineely:fineely-log:1.0.2'
+implementation 'com.fineely:fineely-log:1.0.3'
+implementation 'com.fineely:fineely-log-common:1.0.3'
 ```
 
 ## Usage
@@ -274,6 +280,50 @@ public class KafkaMessageHandler {
         } finally {
             ack.acknowledge();
         }
+    }
+}
+```
+
+And an `dubbo` example `application.yml` configuration file:
+```yaml
+dubbo:
+  application:
+    # Application Name
+    name: example-dubbo
+  registry:
+    address: zookeeper://127.0.0.1:2181
+fineely:
+  log:
+    storage-mode: dubbo
+```
+
+`dubbo[provider]` example `application.yml` configuration file:
+```yaml
+dubbo:
+  application:
+    name: dubbo-example-provider-application
+  protocol:
+    name: tri
+    port: -1
+  registry:
+    address: zookeeper://127.0.0.1:2181
+```
+
+Gradle users add this to your `build.gradle` on `provider`.
+```groovy
+implementation 'com.fineely:fineely-log-common:1.0.3'
+```
+
+Processing method of the `dubbo` :
+
+```java
+@DubboService
+public class FeignLogDaoImpl implements FeignLogDao {
+
+    @Override
+    public boolean saveLog(MethodLogEntity request) {
+        System.out.println(request.toString());
+        return true;
     }
 }
 ```
