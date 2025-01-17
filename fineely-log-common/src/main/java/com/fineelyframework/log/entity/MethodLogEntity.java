@@ -1,12 +1,11 @@
 package com.fineelyframework.log.entity;
 
-import org.springframework.web.bind.annotation.RequestMethod;
-
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class MethodLogEntity {
+public class MethodLogEntity implements Serializable {
 
-    private RequestMethod[] method;
+    private Object[] method;
     private String methodName;
     private String module;
     private String url;
@@ -45,11 +44,11 @@ public class MethodLogEntity {
         this.allParams = allParams;
     }
 
-    public RequestMethod[] getMethod() {
+    public Object[] getMethod() {
         return method;
     }
 
-    public void setMethod(RequestMethod[] method) {
+    public void setMethod(Object[] method) {
         this.method = method;
     }
 
